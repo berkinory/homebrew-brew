@@ -1,7 +1,7 @@
 class Cleanix < Formula
   desc "Developer cleanup tool for macOS and Linux"
   homepage "https://github.com/berkinory/cleanix"
-  version "0.2.0"
+  version "0.2.1"
   license "MIT"
 
   on_macos do
@@ -9,24 +9,24 @@ class Cleanix < Formula
 
     on_arm do
       url "https://github.com/berkinory/cleanix/releases/download/v#{version}/cleanix-aarch64-apple-darwin.tar.gz"
-      sha256 "d7766d81e597d733777fb7d4cd40abbb6a05b627f76aca056670d26911a43502"
+      sha256 "6cb241a6f6c46754449de30dcf1eb56b89a94e070a6ef79690466645709b7480"
     end
 
     on_intel do
       url "https://github.com/berkinory/cleanix/releases/download/v#{version}/cleanix-x86_64-apple-darwin.tar.gz"
-      sha256 "6caf99ff4d8583033eed745d8cbbfc1053546f83f934e05d6b84ecf85151b761"
+      sha256 "86dd12c1de1ea3c0bcd192c082df5950a72c0918bac580f67b94d9840177085a"
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/berkinory/cleanix/releases/download/v#{version}/cleanix-aarch64-unknown-linux-gnu.tar.gz"
-      sha256 "085c88de80196385851119fc33ba014bc2652c397d954c0bba96b8c3ae37e648"
+      sha256 "284a3f7ebefa7e6ce33dcf4903b6f4126df0f46cadb1ae6ccf55386a4d5ac8ee"
     end
 
     on_intel do
       url "https://github.com/berkinory/cleanix/releases/download/v#{version}/cleanix-x86_64-unknown-linux-gnu.tar.gz"
-      sha256 "b955bb08004be41f277ba473baf4f30abf6057d0c2e04ce5cdec1b509269e26e"
+      sha256 "1bc7aba74ef4ec47adf4b970c75227165160fc8279fd38b9b32fea8bc35f5dfa"
     end
   end
 
