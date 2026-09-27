@@ -1,0 +1,82 @@
+name: Update Glade cask
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Published Glade version, without the v prefix"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-glade-cask
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: true
+
+      - name: Update cask from published release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          version="$REQUESTED_VERSION"
+          if [[ -z "$version" ]]; then
+            version="$(gh api repos/berkinory/Glade/releases/latest --jq .tag_name)"
+            version="${version#v}"
+          fi
+          [[ "$version" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || {
+            echo "Invalid stable version: $version" >&2
+            exit 1
+          }
+
+          release="$(gh api "repos/berkinory/Glade/releases/tags/v${version}")"
+          [[ "$(jq -r .draft <<< "$release")" == false ]]
+          [[ "$(jq -r .prerelease <<< "$release")" == false ]]
+          digest="$(jq -r --arg name "Glade-${version}-universal.dmg" \
+            '.assets[] | select(.name == $name) | .digest' <<< "$release")"
+          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]] || {
+            echo "Published universal DMG is missing a SHA-256 digest" >&2
+            exit 1
+          }
+          sha256="${digest#sha256:}"
+
+          mkdir -p Casks
+          cat > Casks/glade.rb <<EOF
+          cask "glade" do
+            version "$version"
+            sha256 "$sha256"
+
+            url "https://github.com/berkinory/Glade/releases/download/v#{version}/Glade-#{version}-universal.dmg"
+            name "Glade"
+            desc "Local-first coding workspace for AI agents"
+            homepage "https://github.com/berkinory/Glade"
+
+            auto_updates true
+
+            app "Glade.app"
+          end
+          EOF
+
+          ruby -c Casks/glade.rb
+          git add Casks/glade.rb
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "Glade cask is already current at ${version}."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: update Glade cask to ${version}"
+          git push origin HEAD:main
