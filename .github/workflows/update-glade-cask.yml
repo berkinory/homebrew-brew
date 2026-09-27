@@ -44,21 +44,27 @@ jobs:
           release="$(gh api "repos/berkinory/Glade/releases/tags/v${version}")"
           [[ "$(jq -r .draft <<< "$release")" == false ]]
           [[ "$(jq -r .prerelease <<< "$release")" == false ]]
-          digest="$(jq -r --arg name "Glade-${version}-universal.dmg" \
+          arm_digest="$(jq -r --arg name "Glade-${version}-arm64.dmg" \
             '.assets[] | select(.name == $name) | .digest' <<< "$release")"
-          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]] || {
-            echo "Published universal DMG is missing a SHA-256 digest" >&2
+          intel_digest="$(jq -r --arg name "Glade-${version}-x64.dmg" \
+            '.assets[] | select(.name == $name) | .digest' <<< "$release")"
+          [[ "$arm_digest" =~ ^sha256:[0-9a-f]{64}$ && "$intel_digest" =~ ^sha256:[0-9a-f]{64}$ ]] || {
+            echo "Published macOS DMGs are missing SHA-256 digests" >&2
             exit 1
           }
-          sha256="${digest#sha256:}"
+          arm_sha256="${arm_digest#sha256:}"
+          intel_sha256="${intel_digest#sha256:}"
 
           mkdir -p Casks
           cat > Casks/glade.rb <<EOF
           cask "glade" do
-            version "$version"
-            sha256 "$sha256"
+            arch arm: "arm64", intel: "x64"
 
-            url "https://github.com/berkinory/Glade/releases/download/v#{version}/Glade-#{version}-universal.dmg"
+            version "$version"
+            sha256 arm:   "$arm_sha256",
+                   intel: "$intel_sha256"
+
+            url "https://github.com/berkinory/Glade/releases/download/v#{version}/Glade-#{version}-#{arch}.dmg"
             name "Glade"
             desc "Local-first coding workspace for AI agents"
             homepage "https://github.com/berkinory/Glade"
