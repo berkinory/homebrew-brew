@@ -1,8 +1,8 @@
 cask "glade" do
   arch arm: "arm64", intel: "x64"
 
-  version "0.0.5"
-  sha256 arm: "3b138143c4bdb4fb7d102fe4c95c52a27dc7fbebfdffe113d96081f69d712e60", intel: "f374b21983b3906be6bb594309181e272f4642e78c7b7cd44a1ef2fe9c606db9"
+  version "0.1.0"
+  sha256 arm: "dc014d4ed3233c434776e22754d9230421de95eef4fced98e241122ae842f76d", intel: "0d1ccc4e93f49c5cd14a59f9935b1e67ae8cb0d5644740c9cf0ebeeacc8813e1"
 
   url "https://github.com/berkinory/Glade/releases/download/v#{version}/Glade-#{version}-#{arch}.dmg"
   name "Glade"
