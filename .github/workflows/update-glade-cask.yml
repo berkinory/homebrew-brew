@@ -44,9 +44,14 @@ jobs:
           release="$(gh api "repos/berkinory/Glade/releases/tags/v${version}")"
           [[ "$(jq -r .draft <<< "$release")" == false ]]
           [[ "$(jq -r .prerelease <<< "$release")" == false ]]
-          arm_digest="$(jq -r --arg name "Glade-${version}-arm64.dmg" \
-            '.assets[] | select(.name == $name) | .digest' <<< "$release")"
-          intel_digest="$(jq -r --arg name "Glade-${version}-x64.dmg" \
+          arm_asset="$(jq -ce --arg name "Glade-${version}-macOS-arm64.dmg" --arg legacy "Glade-${version}-arm64.dmg" \
+            '[.assets[] | select(.name == $name or .name == $legacy)] | if length == 1 then .[0] else error("Expected one Apple Silicon DMG") end' <<< "$release")"
+          arm_digest="$(jq -r .digest <<< "$arm_asset")"
+          artifact_platform=""
+          if [[ "$(jq -r .name <<< "$arm_asset")" == "Glade-${version}-macOS-arm64.dmg" ]]; then
+            artifact_platform="macOS-"
+          fi
+          intel_digest="$(jq -r --arg name "Glade-${version}-${artifact_platform}x64.dmg" \
             '.assets[] | select(.name == $name) | .digest' <<< "$release")"
           [[ "$arm_digest" =~ ^sha256:[0-9a-f]{64}$ && "$intel_digest" =~ ^sha256:[0-9a-f]{64}$ ]] || {
             echo "Published macOS DMGs are missing SHA-256 digests" >&2
@@ -63,7 +68,7 @@ jobs:
             version "$version"
             sha256 arm: "$arm_sha256", intel: "$intel_sha256"
 
-            url "https://github.com/berkinory/Glade/releases/download/v#{version}/Glade-#{version}-#{arch}.dmg"
+            url "https://github.com/berkinory/Glade/releases/download/v#{version}/Glade-#{version}-${artifact_platform}#{arch}.dmg"
             name "Glade"
             desc "Local-first coding workspace for AI agents"
             homepage "https://github.com/berkinory/Glade"
