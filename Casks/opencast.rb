@@ -9,14 +9,12 @@ cask "opencast" do
 
   app "Opencast.app"
 
-  postflight do
-    marker = Pathname.new(Dir.home).join("Library/Application Support/com.opencast.app/distribution")
-    marker.dirname.mkpath
-    marker.write("homebrew\n")
+  postflight_steps do
+    mkdir_p "Library/Application Support/com.opencast.app", base: :home
+    write_file "Library/Application Support/com.opencast.app/distribution", "homebrew\n", base: :home
   end
 
-  uninstall_postflight do
-    marker = Pathname.new(Dir.home).join("Library/Application Support/com.opencast.app/distribution")
-    marker.delete if marker.exist?
+  uninstall_postflight_steps do
+    remove "Library/Application Support/com.opencast.app/distribution", base: :home
   end
 end
