@@ -1,8 +1,8 @@
 cask "glade" do
   arch arm: "arm64", intel: "x64"
 
-  version "0.2.6"
-  sha256 arm: "d6c87e0de8a8bded733c435dd3dca32e264cf6a07545635aa0c78805e0c0cee2", intel: "75db4ff19b105365e94e5c5969249660f488014b884efb13c721f3e0e02c5199"
+  version "0.2.7"
+  sha256 arm: "395250be4c22996f68e8eccd45038161c3b742547a8b5757cfc9987ee2fd2332", intel: "800a794cc81297455de38bd9e77e17be23a5ad830051288f0804768d994ba979"
 
   url "https://github.com/berkinory/Glade/releases/download/v#{version}/Glade-#{version}-macOS-#{arch}.dmg"
   name "Glade"
