@@ -44,14 +44,19 @@ jobs:
           release="$(gh api "repos/berkinory/Glade/releases/tags/v${version}")"
           [[ "$(jq -r .draft <<< "$release")" == false ]]
           [[ "$(jq -r .prerelease <<< "$release")" == false ]]
-          arm_asset="$(jq -ce --arg name "Glade-${version}-macOS-arm64.dmg" --arg legacy "Glade-${version}-arm64.dmg" \
-            '[.assets[] | select(.name == $name or .name == $legacy)] | if length == 1 then .[0] else error("Expected one Apple Silicon DMG") end' <<< "$release")"
+          # Installers are versionless from 0.3.1; older releases named them with the version, and the
+          # oldest also left out the platform.
+          arm_asset="$(jq -ce --arg plain "Glade-macOS-arm64.dmg" --arg versioned "Glade-${version}-macOS-arm64.dmg" \
+            --arg legacy "Glade-${version}-arm64.dmg" \
+            '[.assets[] | select(.name == $plain or .name == $versioned or .name == $legacy)] | if length == 1 then .[0] else error("Expected one Apple Silicon DMG") end' <<< "$release")"
           arm_digest="$(jq -r .digest <<< "$arm_asset")"
-          artifact_platform=""
-          if [[ "$(jq -r .name <<< "$arm_asset")" == "Glade-${version}-macOS-arm64.dmg" ]]; then
-            artifact_platform="macOS-"
-          fi
-          intel_digest="$(jq -r --arg name "Glade-${version}-${artifact_platform}x64.dmg" \
+          case "$(jq -r .name <<< "$arm_asset")" in
+            "Glade-macOS-arm64.dmg") dmg_prefix="Glade-macOS-" ;;
+            "Glade-${version}-macOS-arm64.dmg") dmg_prefix="Glade-#{version}-macOS-" ;;
+            *) dmg_prefix="Glade-#{version}-" ;;
+          esac
+          intel_name="${dmg_prefix//\#\{version\}/$version}x64.dmg"
+          intel_digest="$(jq -r --arg name "$intel_name" \
             '.assets[] | select(.name == $name) | .digest' <<< "$release")"
           [[ "$arm_digest" =~ ^sha256:[0-9a-f]{64}$ && "$intel_digest" =~ ^sha256:[0-9a-f]{64}$ ]] || {
             echo "Published macOS DMGs are missing SHA-256 digests" >&2
@@ -68,10 +73,10 @@ jobs:
             version "$version"
             sha256 arm: "$arm_sha256", intel: "$intel_sha256"
 
-            url "https://github.com/berkinory/Glade/releases/download/v#{version}/Glade-#{version}-${artifact_platform}#{arch}.dmg"
+            url "https://github.com/berkinory/Glade/releases/download/v#{version}/${dmg_prefix}#{arch}.dmg"
             name "Glade"
-            desc "Local-first coding workspace for AI agents"
-            homepage "https://github.com/berkinory/Glade"
+            desc "All-in-one agentic workspace for coding agents"
+            homepage "https://useglade.dev"
 
             auto_updates true
 
