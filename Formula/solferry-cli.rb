@@ -7,12 +7,12 @@ class SolferryCli < Formula
   depends_on :linux
 
   on_arm do
-    url "https://github.com/berkinory/solferry/releases/download/v0.0.3/solferry-cli-linux-aarch64.tar.xz"
-    sha256 "da7c3de46832919ad521f6520bc6a32e01bf97fd0bd5cae54bfd7fa7a756b8cf"
+    url "https://github.com/berkinory/solferry/releases/download/v0.0.4/solferry-cli-linux-aarch64.tar.xz"
+    sha256 "c6d4336600f178fb55526c58cee19cad5eee463d6f320c8668ddf6eca0188b6f"
   end
   on_intel do
-    url "https://github.com/berkinory/solferry/releases/download/v0.0.3/solferry-cli-linux-x86_64.tar.xz"
-    sha256 "341d62c822bb9ead1d0fcbd6ef2b564b13105769ebaee5aae3a78b391ff798ed"
+    url "https://github.com/berkinory/solferry/releases/download/v0.0.4/solferry-cli-linux-x86_64.tar.xz"
+    sha256 "cb9bcada7c70f6d8dc51613e8c79b9b8ba6d052748a70dd677c91be960ebb0c7"
   end
 
   def install
