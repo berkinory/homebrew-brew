@@ -1,9 +1,9 @@
 cask "solferry" do
   arch arm: "aarch64", intel: "x86_64"
 
-  version "0.0.4"
-  sha256 arm:   "8e78d05f64d4697f255aa3fe78eb381347c409420853e2436f374613998f658d",
-         intel: "eefa3dae631c0f40209d305617b24e1fca075cfb9902959166d0835eced0948d"
+  version "0.0.5"
+  sha256 arm:   "60e203ac375efcb6663dbb89bc9f1aa740c76cf5bd96e39bdf0b9d57a690b597",
+         intel: "0a317c613c7add75bd21291ccddce55d2453b246aca7e73c9341d127ef3a84cd"
 
   url "https://github.com/berkinory/solferry/releases/download/v#{version}/Solferry-macos-#{arch}.dmg"
   name "Solferry"
